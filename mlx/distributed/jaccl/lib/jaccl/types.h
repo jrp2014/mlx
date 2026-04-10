@@ -6,6 +6,10 @@
 #include <cstdint>
 #include <type_traits>
 
+#if defined(__aarch64__) && defined(__APPLE__)
+#include <sys/sysctl.h>
+#endif
+
 namespace jaccl {
 
 namespace {
@@ -117,11 +121,34 @@ struct float16_t {
 
 #endif
 
-#ifdef __ARM_FEATURE_BF16
-
-#include <arm_bf16.h>
-
+//
+// Check at runtime if the CPU supports native bfloat16 (FEAT_BF16).
+//
+// This allows us to compile once for all Macs but still enable the feature if
+// it is supported.
+//
+inline bool has_native_bf16_support() {
+#if defined(__aarch64__) && defined(__APPLE__)
+  static bool has_support = []() {
+    int value = 0;
+    size_t value_size = sizeof(value);
+    int success = sysctlbyname(
+        "hw.optional.arm.FEAT_BF16", &value, &value_size, nullptr, 0);
+    return success == 0 & value != 0;
+  }();
+  return has_support;
 #else
+  return false;
+#endif
+}
+
+//
+// The MLX bfloat16 compatibility fallback.
+//
+// Contrary to float16 we always define it and we 'll use
+// has_native_bf16_support to decide if we are going to use __bf16 instead
+// during runtime.
+//
 
 #define __JACCL_BFLOAT_NAN__ 0x7FC0
 
@@ -162,8 +189,6 @@ struct bfloat16_t {
     return *this;
   }
 };
-
-#endif
 
 using complex64_t = std::complex<float>;
 
