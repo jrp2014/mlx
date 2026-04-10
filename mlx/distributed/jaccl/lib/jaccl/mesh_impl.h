@@ -4,11 +4,11 @@
 
 #include <span>
 
-#include "mlx/distributed/jaccl/utils.h"
+#include "jaccl/rdma.h"
 
 constexpr int MESH_MAX_PEERS = 8;
 
-namespace mlx::core::distributed::jaccl {
+namespace jaccl {
 
 class MeshImpl {
  public:
@@ -355,4 +355,4 @@ class MeshImpl {
   std::span<SharedBuffer> buffers_;
 };
 
-} // namespace mlx::core::distributed::jaccl
+} // namespace jaccl
