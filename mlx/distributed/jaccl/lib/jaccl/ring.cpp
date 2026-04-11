@@ -11,11 +11,11 @@ RingGroup::RingGroup(
     int size,
     const std::vector<std::string>& left_devices,
     const std::vector<std::string>& right_devices,
-    const char* coordinator_addr)
+    const std::string& coordinator_addr)
     : rank_(rank),
       size_(size),
       n_conns_(left_devices.size()),
-      side_channel_(rank_, size_, coordinator_addr),
+      side_channel_(rank_, size_, coordinator_addr.c_str()),
       left_(create_connections(left_devices)),
       right_(create_connections(right_devices)) {
   if (left_.size() > RING_MAX_CONNS || right_.size() > RING_MAX_CONNS) {

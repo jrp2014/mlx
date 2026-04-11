@@ -9,10 +9,10 @@ namespace jaccl {
 MeshGroup::MeshGroup(
     int rank,
     const std::vector<std::string>& device_names,
-    const char* coordinator_addr)
+    const std::string& coordinator_addr)
     : rank_(rank),
       size_(device_names.size()),
-      side_channel_(rank_, size_, coordinator_addr),
+      side_channel_(rank_, size_, coordinator_addr.c_str()),
       connections_(create_connections(device_names)) {
   if (size_ > MESH_MAX_PEERS) {
     std::ostringstream msg;
